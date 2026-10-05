@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#fff7e8" />
+  <title>SAYAKA'S DESK</title>
+  <meta name="description" content="Sayaka's personal app launcher" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-bg"></div>
+    <div class="topbar-inner shell">
+      <div class="today-block">
+        <span id="dateLabel">—</span>
+        <strong id="timeLabel">--:--</strong>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell workspace">
+    <section class="compact-toolbar">
+      <div class="section-title">
+        <span class="section-kicker">APPS</span>
+        <span class="count" id="appCount">24</span>
+      </div>
+      <nav class="chips" id="categoryChips" aria-label="カテゴリ"></nav>
+      <div class="toolbar-actions">
+        <label class="search-box" aria-label="アプリ検索">
+          <i data-lucide="search"></i>
+          <input id="searchInput" type="search" placeholder="検索" />
+        </label>
+        <button class="icon-btn" id="resetBtn" type="button" title="表示をリセット"><i data-lucide="rotate-ccw"></i></button>
+      </div>
+    </section>
+
+    <section class="app-grid" id="appGrid" aria-live="polite"></section>
+    <div class="empty-state" id="emptyState" hidden>該当するアプリがありません。</div>
+  </main>
+
+  <aside class="editor-bar" id="editorBar" hidden>
+    <span class="edit-pill"><i data-lucide="pencil"></i> EDIT MODE</span>
+    <button id="addAppBtn" type="button"><i data-lucide="plus"></i>追加</button>
+    <button id="exportBtn" type="button"><i data-lucide="download"></i>書き出し</button>
+    <label class="editor-file-btn"><i data-lucide="upload"></i>読み込み<input id="importInput" type="file" accept="application/json,.json" hidden></label>
+    <button id="restoreBtn" type="button"><i data-lucide="refresh-cw"></i>初期化</button>
+    <a class="view-link" href="./"><i data-lucide="eye"></i>通常表示</a>
+  </aside>
+
+  <dialog id="editDialog" class="edit-dialog">
+    <form id="editForm" method="dialog">
+      <div class="dialog-head">
+        <div>
+          <span class="dialog-kicker">APP SETTINGS</span>
+          <h2 id="dialogTitle">アプリを編集</h2>
+        </div>
+        <button class="close-btn" id="closeDialogBtn" type="button" aria-label="閉じる">×</button>
+      </div>
+
+      <div class="form-grid">
+        <label>アプリ名<input id="titleField" maxlength="40" required></label>
+        <label>カテゴリ
+          <select id="categoryField"></select>
+        </label>
+        <label class="wide new-category-row" id="newCategoryRow" hidden>新しいカテゴリ名
+          <input id="newCategoryField" maxlength="20" placeholder="例：MUSIC">
+        </label>
+        <label class="wide">URL<input id="urlField" type="url" placeholder="https://..."></label>
+        <label>色
+          <select id="colorField">
+            <option value="rose">Rose</option><option value="violet">Violet</option><option value="coral">Coral</option>
+            <option value="amber">Amber</option><option value="mint">Mint</option><option value="orange">Orange</option>
+            <option value="sky">Sky</option><option value="green">Green</option><option value="sand">Sand</option>
+            <option value="lilac">Lilac</option><option value="blue">Blue</option><option value="aqua">Aqua</option>
+          </select>
+        </label>
+
+        <div class="icon-editor wide">
+          <div class="icon-preview" id="iconPreview"><i data-lucide="app-window"></i></div>
+          <div class="icon-controls">
+            <label>Lucideアイコン名<input id="iconField" placeholder="flask-conical"></label>
+            <div class="icon-buttons">
+              <label class="upload-btn">画像を選ぶ<input id="iconUpload" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden></label>
+              <button id="clearImageBtn" type="button">画像を解除</button>
+            </div>
+            <small>PNG / JPG / WEBP / SVG。画像はこのブラウザ内に保存されます。</small>
+          </div>
+        </div>
+
+        <label class="check-row wide"><input id="visibleField" type="checkbox" checked> 通常画面に表示する</label>
+      </div>
+
+      <div class="dialog-actions">
+        <button id="deleteBtn" class="danger" type="button">削除</button>
+        <span></span>
+        <button id="cancelBtn" type="button">キャンセル</button>
+        <button class="save-btn" type="submit">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="apps.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
