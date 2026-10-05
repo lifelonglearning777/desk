@@ -128,3 +128,14 @@ body{font-family:'Noto Sans JP',system-ui,sans-serif}
   .section-kicker{font-size:11px}.chip{font-size:11px}
   .app-meta h3{font-size:14px}
 }
+
+
+/* v6: larger text + clearer edit controls */
+:root{--topbar-h:220px;--toolbar-h:72px}
+body{font-size:16px;}
+.section-kicker{font-size:14px;letter-spacing:.2em;font-weight:700}.count{min-width:32px;height:30px;font-size:13px;font-weight:700}.chip{height:40px;padding:0 18px;font-size:13px;font-weight:700}.search-box{height:42px;width:190px}.search-box input{font-size:14px}.icon-btn{width:42px;height:42px}.icon-btn svg{width:18px;height:18px}
+.app-grid{gap:12px}.app-card{grid-template-columns:68px minmax(0,1fr);padding:12px 33px 12px 14px}.app-icon{width:60px;height:60px}.app-icon svg{width:29px;height:29px}.app-meta{min-height:60px}.app-meta h3{font-size:17px;font-weight:700;line-height:1.18}.app-arrow{font-size:18px;right:12px;top:10px}.edit-badge{width:22px;height:22px;font-size:11px}
+.editor-bar{gap:7px;padding:7px}.editor-bar button,.editor-bar a,.editor-file-btn{height:34px;padding:0 11px;font-size:11px;border-radius:9px}.editor-bar svg{width:14px;height:14px}.edit-pill{height:34px;font-size:11px}.edit-pill svg{width:14px;height:14px}
+.dialog-head h2{font-size:36px;line-height:1.15}.dialog-kicker{font-size:11px;letter-spacing:.18em}.close-btn{font-size:34px}.form-grid{gap:14px}.form-grid label{font-size:12px;gap:7px}.form-grid input,.form-grid select{height:40px;font-size:15px;padding:0 12px}.position-help{grid-column:1 / -1;margin-top:-8px;color:#927965;font-size:12px}.icon-editor{grid-template-columns:96px 1fr;padding:14px}.icon-preview{width:84px;height:84px}.icon-preview svg{width:38px;height:38px}.icon-controls small{font-size:11px}.upload-btn,.icon-buttons button{height:34px;font-size:11px}.check-row{font-size:14px!important}.dialog-actions button{height:38px;font-size:12px;padding:0 16px}
+@media (max-height:820px) and (min-width:1101px){.app-card{grid-template-columns:60px 1fr;padding:10px 31px 10px 12px}.app-icon{width:54px;height:54px}.app-meta h3{font-size:16px}.chip{height:36px;font-size:12px}.editor-bar button,.editor-bar a,.editor-file-btn,.edit-pill{height:32px;font-size:10px}}
+@media(max-width:720px){.dialog-head h2{font-size:28px}.form-grid input,.form-grid select{font-size:14px}.app-meta h3{font-size:15px}.chip{font-size:12px}}
