@@ -139,3 +139,120 @@ body{font-size:16px;}
 .dialog-head h2{font-size:36px;line-height:1.15}.dialog-kicker{font-size:11px;letter-spacing:.18em}.close-btn{font-size:34px}.form-grid{gap:14px}.form-grid label{font-size:12px;gap:7px}.form-grid input,.form-grid select{height:40px;font-size:15px;padding:0 12px}.position-help{grid-column:1 / -1;margin-top:-8px;color:#927965;font-size:12px}.icon-editor{grid-template-columns:96px 1fr;padding:14px}.icon-preview{width:84px;height:84px}.icon-preview svg{width:38px;height:38px}.icon-controls small{font-size:11px}.upload-btn,.icon-buttons button{height:34px;font-size:11px}.check-row{font-size:14px!important}.dialog-actions button{height:38px;font-size:12px;padding:0 16px}
 @media (max-height:820px) and (min-width:1101px){.app-card{grid-template-columns:60px 1fr;padding:10px 31px 10px 12px}.app-icon{width:54px;height:54px}.app-meta h3{font-size:16px}.chip{height:36px;font-size:12px}.editor-bar button,.editor-bar a,.editor-file-btn,.edit-pill{height:32px;font-size:10px}}
 @media(max-width:720px){.dialog-head h2{font-size:28px}.form-grid input,.form-grid select{font-size:14px}.app-meta h3{font-size:15px}.chip{font-size:12px}}
+
+
+/* v7: drag sorting + larger, less-clipped typography */
+.section-kicker{font-size:15px!important}
+.count{font-size:14px!important}
+.chip{font-size:14px!important}
+.search-box input{font-size:15px!important}
+.app-meta h3{
+  font-size:18px!important;
+  font-weight:700!important;
+  line-height:1.18!important;
+  white-space:normal!important;
+  overflow:hidden!important;
+  text-overflow:clip!important;
+  display:-webkit-box!important;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+}
+.app-card{
+  min-width:0;
+}
+.app-meta{min-width:0}
+.editor-bar button,.editor-bar a,.editor-file-btn,.edit-pill{font-size:12px!important}
+.drag-tip{
+  height:34px;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:0 9px;
+  color:#7a5b40;
+  font-size:11px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.drag-tip svg{width:14px;height:14px}
+
+.form-grid label{font-size:14px!important}
+.form-grid input,.form-grid select{font-size:16px!important;height:42px!important}
+.position-help{font-size:13px!important}
+.icon-controls small{font-size:12px!important}
+.upload-btn,.icon-buttons button{font-size:12px!important}
+.check-row{font-size:15px!important}
+.dialog-actions button{font-size:13px!important;height:40px!important}
+.dialog-kicker{font-size:12px!important}
+.dialog-head h2{font-size:38px!important}
+
+.drag-handle{
+  position:absolute;
+  left:7px;
+  top:7px;
+  width:25px;
+  height:25px;
+  display:grid;
+  place-items:center;
+  border:0;
+  border-radius:8px;
+  background:rgba(255,255,255,.78);
+  color:#9a6b3e;
+  cursor:grab;
+  opacity:.72;
+  z-index:5;
+  box-shadow:0 2px 8px rgba(78,50,24,.06);
+}
+.drag-handle:hover{opacity:1;background:#fff}
+.drag-handle:active{cursor:grabbing}
+.drag-handle svg{width:15px;height:15px}
+.edit-mode .app-card{padding-left:39px}
+.app-card.dragging{
+  opacity:.42;
+  transform:scale(.985);
+  box-shadow:0 10px 24px rgba(80,52,27,.12);
+}
+.app-card.drag-over-before::before,
+.app-card.drag-over-after::after{
+  content:"";
+  position:absolute;
+  left:-5px;
+  right:-5px;
+  height:4px;
+  border-radius:999px;
+  background:#d58b24;
+  box-shadow:0 0 0 3px rgba(213,139,36,.12);
+  z-index:8;
+}
+.app-card.drag-over-before::before{top:-7px}
+.app-card.drag-over-after::after{bottom:-7px}
+.is-dragging .app-card{transition:box-shadow .12s ease,opacity .12s ease}
+
+.save-toast{
+  position:fixed;
+  left:50%;
+  bottom:22px;
+  transform:translate(-50%,18px);
+  padding:10px 16px;
+  border-radius:999px;
+  background:#5e3b20;
+  color:#fff;
+  font-size:13px;
+  font-weight:700;
+  opacity:0;
+  pointer-events:none;
+  z-index:100;
+  transition:.2s ease;
+  box-shadow:0 10px 26px rgba(63,40,20,.22);
+}
+.save-toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-height:820px) and (min-width:1101px){
+  .app-meta h3{font-size:16px!important}
+  .chip{font-size:12px!important}
+  .section-kicker{font-size:13px!important}
+}
+@media(max-width:720px){
+  .drag-tip{display:none}
+  .app-meta h3{font-size:15px!important}
+  .dialog-head h2{font-size:30px!important}
+}

@@ -44,7 +44,7 @@
   </main>
 
   <aside class="editor-bar" id="editorBar" hidden>
-    <span class="edit-pill"><i data-lucide="pencil"></i> EDIT MODE</span>
+    <span class="edit-pill"><i data-lucide="pencil"></i> EDIT MODE</span><span class="drag-tip"><i data-lucide="grip-vertical"></i>カードをドラッグで並べ替え</span>
     <button id="addAppBtn" type="button"><i data-lucide="plus"></i>追加</button>
     <button id="exportBtn" type="button"><i data-lucide="download"></i>書き出し</button>
     <label class="editor-file-btn"><i data-lucide="upload"></i>読み込み<input id="importInput" type="file" accept="application/json,.json" hidden></label>
@@ -70,7 +70,7 @@
         <label>表示位置
           <select id="positionField"></select>
         </label>
-        <small class="position-help">ここで並ぶ場所を選べます。1番目が左上です。</small>
+        <small class="position-help">追加・編集後の位置を選べます。カード名の「前」に入ります。</small>
         <label class="wide new-category-row" id="newCategoryRow" hidden>新しいカテゴリ名
           <input id="newCategoryField" maxlength="20" placeholder="例：MUSIC">
         </label>

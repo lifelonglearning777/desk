@@ -42,13 +42,19 @@ function populateCategorySelect(selected='TOOLS'){
 }
 function populatePositionSelect(selectedIndex, isNew=false){
   const select=document.getElementById('positionField');
-  const total=isNew?apps.length+1:apps.length;
-  const current=Math.max(0,Math.min(selectedIndex??(total-1),total-1));
-  select.innerHTML=Array.from({length:total},(_,i)=>{
-    const row=Math.floor(i/6)+1, col=(i%6)+1;
-    const suffix=(isNew&&i===apps.length)?'（最後に追加）':`（${row}段目・${col}列目）`;
-    return `<option value="${i}">${i+1}番目 ${suffix}</option>`;
-  }).join('');
+  const editingAppId=isNew?null:editingId;
+  const baseApps=editingAppId?apps.filter(a=>a.id!==editingAppId):apps;
+  const total=baseApps.length+1;
+  const current=Math.max(0,Math.min(selectedIndex??baseApps.length,baseApps.length));
+
+  const options=[];
+  for(let i=0;i<baseApps.length;i++){
+    const row=Math.floor(i/6)+1;
+    const col=(i%6)+1;
+    options.push(`<option value="${i}">${i+1}番目 — ${escapeHtml(baseApps[i].title)} の前（${row}段目・${col}列目）</option>`);
+  }
+  options.push(`<option value="${baseApps.length}">最後に追加</option>`);
+  select.innerHTML=options.join('');
   select.value=String(current);
 }
 function renderChips(){
@@ -65,16 +71,118 @@ function renderApps(){
     const cat=(app.category||'OTHER').toUpperCase();
     return (activeCategory==='ALL'||cat===activeCategory)&&(!q||`${app.title} ${cat}`.toLowerCase().includes(q));
   });
+
   grid.innerHTML=visible.map(app=>{
     const hidden=isEditMode&&app.visible===false;
     const target=isEditMode?'':'target="_blank" rel="noopener noreferrer"';
+    const dragHandle=isEditMode?'<button class="drag-handle" type="button" draggable="true" aria-label="ドラッグして並べ替え" title="ドラッグして並べ替え"><i data-lucide="grip-vertical"></i></button>':'';
     return `<a class="app-card ${hidden?'is-hidden':''}" href="${isEditMode?'#':escapeHtml(safeUrl(app.url))}" ${target} data-id="${escapeHtml(app.id)}" data-color="${escapeHtml(app.color||'amber')}">
-      <div class="app-icon">${iconHtml(app)}</div><div class="app-meta"><h3>${escapeHtml(app.title)}</h3></div><span class="app-arrow">↗</span>${isEditMode?'<span class="edit-badge">✎</span>':''}</a>`;
+      ${dragHandle}<div class="app-icon">${iconHtml(app)}</div><div class="app-meta"><h3>${escapeHtml(app.title)}</h3></div><span class="app-arrow">↗</span>${isEditMode?'<span class="edit-badge">✎</span>':''}</a>`;
   }).join('');
+
   appCount.textContent=String(visible.length);
   emptyState.hidden=visible.length!==0;
   if(window.lucide) lucide.createIcons({attrs:{'stroke-width':1.8}});
-  if(isEditMode) grid.querySelectorAll('.app-card').forEach(card=>card.addEventListener('click',e=>{e.preventDefault();openEditor(card.dataset.id);}));
+
+  if(isEditMode){
+    grid.querySelectorAll('.app-card').forEach(card=>{
+      card.addEventListener('click',e=>{
+        if(performance.now()-lastDragEnd<250)return;
+        if(e.target.closest('.drag-handle'))return;
+        e.preventDefault();
+        openEditor(card.dataset.id);
+      });
+    });
+    setupDragSort();
+  }
+}
+
+let dragId=null;
+let lastDragEnd=0;
+
+function moveAppRelative(sourceId,targetId,placeAfter=false){
+  if(!sourceId||!targetId||sourceId===targetId)return;
+  const sourceIndex=apps.findIndex(a=>a.id===sourceId);
+  if(sourceIndex<0)return;
+  const [source]=apps.splice(sourceIndex,1);
+  let targetIndex=apps.findIndex(a=>a.id===targetId);
+  if(targetIndex<0){apps.splice(sourceIndex,0,source);return;}
+  if(placeAfter)targetIndex+=1;
+  apps.splice(targetIndex,0,source);
+  saveApps();
+}
+
+function setupDragSort(){
+  const cards=[...grid.querySelectorAll('.app-card')];
+
+  cards.forEach(card=>{
+    const handle=card.querySelector('.drag-handle');
+    if(!handle)return;
+
+    handle.addEventListener('click',e=>{
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    handle.addEventListener('dragstart',e=>{
+      dragId=card.dataset.id;
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain',dragId);
+      requestAnimationFrame(()=>document.body.classList.add('is-dragging'));
+    });
+
+    handle.addEventListener('dragend',()=>{
+      card.classList.remove('dragging');
+      grid.querySelectorAll('.drag-over-before,.drag-over-after').forEach(el=>el.classList.remove('drag-over-before','drag-over-after'));
+      document.body.classList.remove('is-dragging');
+      dragId=null;
+      lastDragEnd=performance.now();
+      renderApps();
+    });
+
+    card.addEventListener('dragover',e=>{
+      if(!dragId||dragId===card.dataset.id)return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      const sourceVisibleIndex=cards.findIndex(c=>c.dataset.id===dragId);
+      const targetVisibleIndex=cards.findIndex(c=>c.dataset.id===card.dataset.id);
+      const after=sourceVisibleIndex<targetVisibleIndex;
+      grid.querySelectorAll('.drag-over-before,.drag-over-after').forEach(el=>el.classList.remove('drag-over-before','drag-over-after'));
+      card.classList.add(after?'drag-over-after':'drag-over-before');
+    });
+
+    card.addEventListener('drop',e=>{
+      if(!dragId||dragId===card.dataset.id)return;
+      e.preventDefault();
+      e.stopPropagation();
+      const sourceVisibleIndex=cards.findIndex(c=>c.dataset.id===dragId);
+      const targetVisibleIndex=cards.findIndex(c=>c.dataset.id===card.dataset.id);
+      const after=sourceVisibleIndex<targetVisibleIndex;
+      moveAppRelative(dragId,card.dataset.id,after);
+      lastDragEnd=performance.now();
+      renderApps();
+      showToast('並び順を保存しました');
+    });
+  });
+
+  grid.addEventListener('dragover',e=>{
+    if(dragId)e.preventDefault();
+  },{once:true});
+}
+
+function showToast(message){
+  let toast=document.getElementById('saveToast');
+  if(!toast){
+    toast=document.createElement('div');
+    toast.id='saveToast';
+    toast.className='save-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent=message;
+  toast.classList.add('show');
+  clearTimeout(showToast.timer);
+  showToast.timer=setTimeout(()=>toast.classList.remove('show'),1300);
 }
 
 function openEditor(id){
@@ -152,7 +260,7 @@ document.getElementById('cancelBtn').addEventListener('click',()=>dialog.close()
 
 document.getElementById('addAppBtn').addEventListener('click',openNew);
 document.getElementById('exportBtn').addEventListener('click',()=>{
-  const blob=new Blob([JSON.stringify({version:2,apps},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`sayaka-desk-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href);
+  const blob=new Blob([JSON.stringify({version:3,apps},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`sayaka-desk-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href);
 });
 document.getElementById('importInput').addEventListener('change',async e=>{
   const file=e.target.files?.[0];if(!file)return;
