@@ -40,6 +40,17 @@ function populateCategorySelect(selected='TOOLS'){
   const row=document.getElementById('newCategoryRow');
   row.hidden=select.value!=='__NEW__';
 }
+function populatePositionSelect(selectedIndex, isNew=false){
+  const select=document.getElementById('positionField');
+  const total=isNew?apps.length+1:apps.length;
+  const current=Math.max(0,Math.min(selectedIndex??(total-1),total-1));
+  select.innerHTML=Array.from({length:total},(_,i)=>{
+    const row=Math.floor(i/6)+1, col=(i%6)+1;
+    const suffix=(isNew&&i===apps.length)?'（最後）':`（${row}段目・${col}列目）`;
+    return `<option value="${i}">${i+1}番目 ${suffix}</option>`;
+  }).join('');
+  select.value=String(current);
+}
 function renderChips(){
   const categories=getCategories();
   if(!categories.includes(activeCategory)) activeCategory='ALL';
@@ -75,6 +86,7 @@ function openEditor(id){
   document.getElementById('titleField').value=app.title||'';
   document.getElementById('urlField').value=app.url==='#'?'':app.url||'';
   populateCategorySelect((app.category||'TOOLS').toUpperCase());
+  populatePositionSelect(apps.findIndex(a=>a.id===id),false);
   document.getElementById('newCategoryField').value='';
   document.getElementById('colorField').value=app.color||'amber';
   document.getElementById('iconField').value=app.icon||'app-window';
@@ -86,7 +98,7 @@ function openNew(){
   editingId=null;pendingImage='';
   document.getElementById('dialogTitle').textContent='アプリを追加';
   form.reset();
-  document.getElementById('colorField').value='amber';document.getElementById('iconField').value='app-window';populateCategorySelect('TOOLS');document.getElementById('newCategoryField').value='';document.getElementById('visibleField').checked=true;
+  document.getElementById('colorField').value='amber';document.getElementById('iconField').value='app-window';populateCategorySelect('TOOLS');populatePositionSelect(apps.length,true);document.getElementById('newCategoryField').value='';document.getElementById('visibleField').checked=true;
   document.getElementById('deleteBtn').hidden=true;
   updatePreview();dialog.showModal();
 }
@@ -115,7 +127,16 @@ form.addEventListener('submit',e=>{
   const data={
     id:editingId||uid(),title:document.getElementById('titleField').value.trim(),subtitle:'',url:safeUrl(document.getElementById('urlField').value),category,color:document.getElementById('colorField').value,icon:document.getElementById('iconField').value.trim()||'app-window',image:pendingImage,visible:document.getElementById('visibleField').checked
   };
-  if(editingId){const i=apps.findIndex(a=>a.id===editingId);apps[i]=data;}else apps.push(data);
+  const requestedIndex=Number(document.getElementById('positionField').value);
+  if(editingId){
+    const oldIndex=apps.findIndex(a=>a.id===editingId);
+    if(oldIndex>=0) apps.splice(oldIndex,1);
+    const target=Math.max(0,Math.min(requestedIndex,apps.length));
+    apps.splice(target,0,data);
+  }else{
+    const target=Math.max(0,Math.min(requestedIndex,apps.length));
+    apps.splice(target,0,data);
+  }
   saveApps();dialog.close();renderChips();renderApps();
 });
 document.getElementById('deleteBtn').addEventListener('click',()=>{if(!editingId)return;if(confirm('このアプリを削除しますか？')){apps=apps.filter(a=>a.id!==editingId);saveApps();dialog.close();renderChips();renderApps();}});
